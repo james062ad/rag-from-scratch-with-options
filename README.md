@@ -1,139 +1,74 @@
-﻿# RAG from Scratch – Extended Edition 🧪✨
+﻿
+# 🧠 RAG from Scratch – Extended Edition: Project Summary & Reflection
 
-This repository builds on the MVP version of the RAG system submitted for the Oxford LLMOps assignment.
+## 🔧 What We Built
 
-It serves as a sandbox for exploring optional enhancements and advanced features including UI integration, live data ingestion, LLMOps, and CI/CD.
+This project expands on the basic RAG (Retrieval-Augmented Generation) assignment to create a **fully operational AI-powered research assistant**. The extended version includes:
 
----
+- A **FastAPI backend** that supports:
+  - GPT-based response generation from user queries
+  - Vector-based similarity search using pgvector
+  - Synthetic paper ingestion and embedding
+- A **PostgreSQL vector database** (Dockerized) with `pgvector`
+- A **Lovable.dev frontend** to interactively:
+  - Ask research questions
+  - Retrieve context chunks
+  - Display LLM-generated answers
+- A full **development workflow** using:
+  - `poetry` for dependency management
+  - `.env` and `.env.example` for clean configuration
+  - `ngrok` for public testing from a local backend
 
-## 🔍 What This Repo Adds
+## ⚠️ Challenges Faced (and How We Solved Them)
 
-- ✅ Frontend integration via Lovable.dev or Gradio
-- ✅ Modular expansion of ingestion sources (arXiv, papers-downloads/)
-- ✅ Optional LLMOps support via Opik for tracing and scoring
-- ✅ Planned GitHub Actions for CI
-- ✅ Additional components for deployment to Hugging Face or Render
-- ✅ Schema validation tools to catch DB/backend mismatches
+| Issue | Resolution |
+|-------|------------|
+| ❌ Internal Server Errors (500) | Mismatch between database column name (`chunk` vs `text`) in SQL queries. Fixed by inspecting schema using `\d papers`. |
+| ❌ HEAD Requests Failing (405) | The FastAPI backend only supports `POST`, not `HEAD`. Updated Lovable’s `checkServerStatus` function to use `POST`. |
+| ❌ Ngrok Disconnection | New tunnels required re-pasting the URL into Lovable. Handled with clear ngrok instructions and prompts. |
+| ❌ Vector column casting issues | `embedding` column was not updated to `vector(1536)`. Resolved via custom script `alter_embedding_column.py`. |
+| ❌ Misconfigured `.env` | Default `POSTGRES_USER` was not aligned with the Docker setup. Updated to use `myuser`, `mypassword`, `mydb`. |
+| ❌ JSON decoding errors | Caused by malformed or empty POST payloads. Fixed with improved validation and Swagger testing. |
 
----
+## ✅ Assignment Objectives (Extended)
 
-## 🌱 Based on
+| Requirement | Met? | Where? |
+|-------------|------|--------|
+| PostgreSQL + pgvector | ✅ | Docker + `init_pgvector.sql` |
+| Embedding with OpenAI | ✅ | `get_query_embedding()` |
+| Vector similarity search | ✅ | `retrieve_top_chunks()` |
+| GPT answer generation | ✅ | `/generate` endpoint |
+| FastAPI server | ✅ | `src/main.py` |
+| Config via `.env` | ✅ | `.env`, `.env.example` |
+| Poetry setup | ✅ | `pyproject.toml` |
+| Optional frontend | ✅ | Lovable.dev interface |
+| Remote testing (optional) | ✅ | `ngrok` integration |
+| Optional tools | ✅ | `check_schema.py`, `alter_embedding_column.py` |
 
-The MVP version lives at:  
-👉 https://github.com/james062ad/rag-from-scratch
+## 📚 Alignment with *Designing LLM Applications with LangChain*
 
-That version is locked and represents the original assignment submission. This version is **safe to iterate on, deploy, and expand**.
+| Book Concept | This Project |
+|--------------|--------------|
+| **RAG Pipeline** | Custom-built, no LangChain |
+| **Retriever design** | PostgreSQL + pgvector + cosine distance |
+| **Chunk management** | Synthetic ingestion and embedding |
+| **Prompt templating** | Fixed format in backend |
+| **Multi-stage reasoning** | Future roadmap potential |
+| **Frontend integration** | Achieved using Lovable.dev |
+| **Edge deployment** | Tested via ngrok tunnel |
 
----
+## 💡 Lessons Learned
 
-## 📂 Project Structure
+- A mismatch between schema and assumptions (like missing `text` columns) can silently break a backend — **check with `\d` first**.
+- `HEAD` requests aren’t always supported by FastAPI routes — use `POST` for server status checks when needed.
+- Environment and tooling setup (Docker, Poetry, Ngrok) are **essential for smooth development** — automation and logs save hours.
+- Testing with **Swagger** is critical before connecting to frontends like **Lovable**.
 
-```text
-rag-from-scratch-with-options/
-├── ingestion/
-├── retrieval/
-├── src/
-├── scripts/
-├── .env.example
-├── RAG_Checklist.md        ✅
-├── check_schema.py         ✅
-├── docker-compose.yml
-├── pyproject.toml
-├── README.md
-```
+## ✅ Current Status
 
----
+✅ Working end-to-end:  
+- Ask a question  
+- Retrieve relevant chunks  
+- Generate GPT-based response  
+- Visualize results in frontend
 
-## 🚀 Setup Instructions
-
-### 1. Clone the Repo
-
-```bash
-git clone https://github.com/james062ad/rag-from-scratch-with-options.git
-cd rag-from-scratch-with-options
-```
-
-### 2. Set Up Poetry and Docker
-
-```bash
-poetry install
-poetry shell
-docker-compose up -d
-```
-
-### 3. Ingest Test Data
-
-```bash
-python ingestion/ingest_synthetic.py
-```
-
-### 4. Run the App
-
-```bash
-uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-Then visit: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-
----
-
-## 💬 Query Example (POST `/generate`)
-
-```json
-{
-  "query": "How does graphene support energy storage?"
-}
-```
-
-Expected Response:
-
-```json
-{
-  "query": "...",
-  "answer": "...",
-  "chunks_used": [ "...", "...", "..." ]
-}
-```
-
----
-
-## 🛡️ Schema Validation Tools
-
-To prevent database mismatches (like referencing non-existent columns), this project includes:
-
-### 📋 `RAG_Checklist.md`
-- Preflight DB + backend alignment checklist
-- Covers `.env`, Docker, schema inspection, and test flow
-
-### 🧪 `check_schema.py`
-- Python script to check for required columns in the `papers` table
-- Helps ensure `chunk`, `summary`, and `embedding` exist
-
-To run:
-
-```bash
-python check_schema.py
-```
-
----
-
-## 💡 Ideas to Explore
-
-- 🌐 Host backend on Render
-- 🌸 Build UI in Gradio / Lovable.dev
-- 📈 Add Opik tracing
-- 🔄 Schedule ingestion from arXiv RSS feeds
-- 🧪 Add LLM evaluation or scoring rules
-
----
-
-## 🧠 Why This Matters
-
-This repo demonstrates technical curiosity, engineering control, and passion for learning beyond minimum submission requirements. It showcases professional dev practices while remaining grounded in explainability and modularity.
-
----
-
-## 🏁 Status
-
-MVP cloned and bootstrapped.  
-This branch is now open for experimentation and deployment. 🚀
