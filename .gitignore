@@ -1,20 +1,33 @@
-# Python + Poetry
+# Python
 __pycache__/
 *.py[cod]
-*.env
-.env
-.env.*
+*.so
+
+# Poetry
 .venv/
 poetry.lock
+
+# Environment
+.env
+.env.*
+
+# Distribution
+dist/
+build/
+*.egg-info/
+*.egg
+MANIFEST
+.eggs/
 
 # VS Code
 .vscode/
 *.code-workspace
 
-# OS files
+# OS/System
 .DS_Store
 Thumbs.db
 
-# Docker
-*.pid
+# Docker/Postgres
 *.log
+*.pid
+data/
