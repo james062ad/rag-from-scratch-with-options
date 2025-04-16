@@ -1,113 +1,91 @@
-﻿# RAG from Scratch – Oxford LLMOps Assignment
+﻿# RAG from Scratch – Extended Edition 🧪✨
 
-A fully functional Retrieval-Augmented Generation (RAG) microservice built using core Python, FastAPI, PostgreSQL with pgvector, and OpenAI embeddings/GPT. This project was developed independently (without using the provided GitHub repo) to demonstrate full comprehension, modular design, and practical engineering capability.
+This repository builds on the MVP version of the RAG system submitted for the Oxford LLMOps assignment.
 
----
-
-## ✅ Features
-
-- ✅ PostgreSQL + pgvector vector store (Dockerised)
-- ✅ Ingestion of synthetic research abstracts
-- ✅ OpenAI embedding for chunks and queries
-- ✅ Vector similarity search (top-k)
-- ✅ GPT-3.5 generation using retrieved context
-- ✅ Exposed via `/generate` FastAPI endpoint
-- ✅ Tested interactively with Swagger UI
-- ✅ Modular and explainable pipeline with `.env` and Poetry
+It serves as a sandbox for exploring optional enhancements and advanced features including UI integration, live data ingestion, LLMOps, and CI/CD.
 
 ---
 
-## 🚀 Getting Started
+## 🔍 What This Repo Adds
 
-### 1. Clone the Repository
+- ✅ Frontend integration via Lovable.dev or Gradio
+- ✅ Modular expansion of ingestion sources (arXiv, papers-downloads/)
+- ✅ Optional LLMOps support via Opik for tracing and scoring
+- ✅ Planned GitHub Actions for CI
+- ✅ Additional components for deployment to Hugging Face or Render
 
-```bash
-git clone https://github.com/james062ad/rag-from-scratch.git
-cd rag-from-scratch
+---
+
+## 🌱 Based on
+
+The MVP version lives at:  
+👉 https://github.com/james062ad/rag-from-scratch
+
+That version is locked and represents the original assignment submission. This version is **safe to iterate on, deploy, and expand**.
+
+---
+
+## 📂 Project Structure (Same Base)
+
+```text
+rag-from-scratch-with-options/
+├── ingestion/
+├── retrieval/
+├── src/
+├── scripts/
+├── .env.example
+├── docker-compose.yml
+├── pyproject.toml
+└── README.md
 ```
 
-### 2. Install Python Dependencies
+---
+
+## 🚀 Setup Instructions
+
+### 1. Clone the Repo
+
+```bash
+git clone https://github.com/james062ad/rag-from-scratch-with-options.git
+cd rag-from-scratch-with-options
+```
+
+### 2. Set Up Poetry and Docker
 
 ```bash
 poetry install
 poetry shell
-```
-
-### 3. Start the Vector Database (Docker)
-
-```bash
 docker-compose up -d
 ```
 
-### 4. (Optional) Ingest Synthetic Data
-
-```bash
-python ingestion/ingest_synthetic.py
-```
-
-### 5. Run the FastAPI Server
+### 3. Run the App
 
 ```bash
 uvicorn src.main:app --reload
 ```
 
-### 6. Test the Endpoint in Swagger
-
-Open your browser at:  
-👉 `http://127.0.0.1:8000/docs`
-
-Try the `/generate` route with a query like:
-
-```json
-{ "query": "What are the benefits of using graphene in energy storage?" }
-```
+Test it at: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ---
 
-## 📂 Project Structure
+## 💡 Ideas to Explore
 
-```text
-rag-from-scratch/
-├── ingestion/            # Load & embed paper chunks
-├── retrieval/            # Search & generate answer
-├── src/                  # FastAPI app with /generate
-├── scripts/              # Utility scripts (e.g. alter DB)
-├── .env.example          # Safe environment config
-├── docker-compose.yml    # Docker setup for Postgres
-├── pyproject.toml        # Poetry environment
-├── Final_Submission_Bundle.zip  # Submission-ready docs
-```
+- 🌐 Host backend on Render
+- 🌸 Build UI in Gradio / Lovable.dev
+- 📈 Add Opik tracing
+- 🔄 Schedule ingestion from arXiv RSS feeds
+- 🧪 Add LLM evaluation or scoring rules
 
 ---
 
-## 🧠 Assignment & Book Alignment
+## 🧠 Why This Matters
 
-This project fully satisfies all key requirements from the Oxford LLMOps Assignment:
-
-| Requirement | Met |
-|-------------|-----|
-| PostgreSQL + pgvector | ✅ Step 3 |
-| Embedding with OpenAI | ✅ Step 4, 6 |
-| Query similarity search | ✅ Step 6 |
-| GPT answer with context | ✅ Step 7 |
-| Exposed FastAPI /generate | ✅ Step 8 |
-| Structured modular code | ✅ Throughout |
-| Book alignment: Ch. 4–8 | ✅ All |
-
----
-
-## ✨ Optional Enhancements (Next Steps)
-
-- 🔎 Add tracing and scoring with Opik
-- 🧠 Ingest `papers-downloads/` and arXiv abstracts
-- ⚙️ Add GitHub Actions CI pipeline
-- 🌍 Deploy backend to Render or Hugging Face
-- 💻 Add a frontend (Gradio or Lovable.dev)
+This repo demonstrates technical curiosity, engineering control, and passion for learning beyond minimum submission requirements. It showcases professional dev practices while remaining grounded in explainability and modularity.
 
 ---
 
 ## 🏁 Status
 
-✅ MVP complete and fully working.  
-🔄 Modular, explainable, deployable — ready for extension and demo.
+MVP cloned and bootstrapped.  
+This branch is now open for rapid experimentation and feature enhancement. 🚀
 
