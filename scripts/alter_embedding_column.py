@@ -13,9 +13,9 @@ DB_PARAMS = {
     "password": os.getenv("POSTGRES_PASSWORD")
 }
 
-# SQL to alter the embedding column
+# ✅ Corrected: Alter the right table (chunks)
 sql = """
-ALTER TABLE papers
+ALTER TABLE chunks
 ALTER COLUMN embedding TYPE vector(1536);
 """
 
@@ -25,7 +25,7 @@ try:
     cur = conn.cursor()
     cur.execute(sql)
     conn.commit()
-    print("✅ Column successfully updated to vector(1536)")
+    print("✅ Column successfully updated to vector(1536) in 'chunks'")
 except Exception as e:
     print("❌ Error:", e)
 finally:
