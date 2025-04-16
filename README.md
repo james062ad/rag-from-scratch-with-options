@@ -1,6 +1,14 @@
 ﻿
 # 🧠 RAG from Scratch – Extended Edition: Project Summary & Reflection
 
+![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-ready-brightgreen?logo=fastapi)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pgvector-informational?logo=postgresql)
+![Lovable](https://img.shields.io/badge/Frontend-Lovable.dev-ff69b4?logo=bolt)
+![Status](https://img.shields.io/badge/System-Working-green?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-blue)
+
+
 ## 🔧 What We Built
 
 This project expands on the basic RAG (Retrieval-Augmented Generation) assignment to create a **fully operational AI-powered research assistant**. The extended version includes:
