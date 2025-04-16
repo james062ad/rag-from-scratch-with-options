@@ -13,6 +13,7 @@ It serves as a sandbox for exploring optional enhancements and advanced features
 - ✅ Optional LLMOps support via Opik for tracing and scoring
 - ✅ Planned GitHub Actions for CI
 - ✅ Additional components for deployment to Hugging Face or Render
+- ✅ Schema validation tools to catch DB/backend mismatches
 
 ---
 
@@ -25,7 +26,7 @@ That version is locked and represents the original assignment submission. This v
 
 ---
 
-## 📂 Project Structure (Same Base)
+## 📂 Project Structure
 
 ```text
 rag-from-scratch-with-options/
@@ -34,9 +35,11 @@ rag-from-scratch-with-options/
 ├── src/
 ├── scripts/
 ├── .env.example
+├── RAG_Checklist.md        ✅
+├── check_schema.py         ✅
 ├── docker-compose.yml
 ├── pyproject.toml
-└── README.md
+├── README.md
 ```
 
 ---
@@ -58,13 +61,59 @@ poetry shell
 docker-compose up -d
 ```
 
-### 3. Run the App
+### 3. Ingest Test Data
 
 ```bash
-uvicorn src.main:app --reload
+python ingestion/ingest_synthetic.py
 ```
 
-Test it at: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+### 4. Run the App
+
+```bash
+uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Then visit: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+---
+
+## 💬 Query Example (POST `/generate`)
+
+```json
+{
+  "query": "How does graphene support energy storage?"
+}
+```
+
+Expected Response:
+
+```json
+{
+  "query": "...",
+  "answer": "...",
+  "chunks_used": [ "...", "...", "..." ]
+}
+```
+
+---
+
+## 🛡️ Schema Validation Tools
+
+To prevent database mismatches (like referencing non-existent columns), this project includes:
+
+### 📋 `RAG_Checklist.md`
+- Preflight DB + backend alignment checklist
+- Covers `.env`, Docker, schema inspection, and test flow
+
+### 🧪 `check_schema.py`
+- Python script to check for required columns in the `papers` table
+- Helps ensure `chunk`, `summary`, and `embedding` exist
+
+To run:
+
+```bash
+python check_schema.py
+```
 
 ---
 
@@ -87,5 +136,4 @@ This repo demonstrates technical curiosity, engineering control, and passion for
 ## 🏁 Status
 
 MVP cloned and bootstrapped.  
-This branch is now open for rapid experimentation and feature enhancement. 🚀
-
+This branch is now open for experimentation and deployment. 🚀
