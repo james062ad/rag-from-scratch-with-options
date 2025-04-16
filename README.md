@@ -72,3 +72,12 @@ This project expands on the basic RAG (Retrieval-Augmented Generation) assignmen
 - Generate GPT-based response  
 - Visualize results in frontend
 
+---
+
+## 📘 Conceptual Overview
+
+Want to understand how the backend, database, GPT, and frontend all connect?
+
+👉 [Click here to read the full system overview](./RAG_Conceptual_Overview.md)
+
+---
