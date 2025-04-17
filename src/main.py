@@ -1,94 +1,75 @@
-import os
-import openai
-import psycopg2
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from dotenv import load_dotenv
-from typing import List
+import openai
+import os
 
-# Load environment variables
-load_dotenv()
+from src.retrieval.retrieve_chunks import retrieve_top_chunks
+from src.retrieval.generate_answer import get_query_embedding
+from src.retrieval.db_utils import connect_db, ensure_pgvector
 
+# Load API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# PostgreSQL connection parameters
-DB_PARAMS = {
-    "host": "localhost",
-    "port": os.getenv("POSTGRES_PORT", 5432),
-    "dbname": os.getenv("POSTGRES_DB"),
-    "user": os.getenv("POSTGRES_USER"),
-    "password": os.getenv("POSTGRES_PASSWORD"),
-}
-
-# FastAPI setup
+# FastAPI app
 app = FastAPI()
 
-# Allow CORS for testing with frontends
+# CORS middleware (for Lovable or local frontend)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Ensure pgvector extension is enabled on DB
+ensure_pgvector()
+
 # Request body model
-class Query(BaseModel):
+class QueryRequest(BaseModel):
     query: str
+    source: str | None = None  # Optional source filter: "tutor", "arxiv", "synthetic", "all"
 
-# 🔍 Embed query using OpenAI
-def get_query_embedding(text: str) -> List[float]:
-    response = openai.Embedding.create(
-        input=text,
-        model="text-embedding-ada-002"
-    )
-    return response["data"][0]["embedding"]
-
-# 🔍 Retrieve similar chunks from DB (🛠️ FIXED CASTING!)
-def retrieve_top_chunks(embedding: List[float]) -> List[str]:
-    try:
-        conn = psycopg2.connect(**DB_PARAMS)
-        cur = conn.cursor()
-
-        # ✅ Explicit cast to ::vector
-        cur.execute(
-            "SELECT chunk FROM papers ORDER BY embedding <-> %s::vector LIMIT 3",
-            (embedding,)
-        )
-        results = [row[0] for row in cur.fetchall()]
-        return results
-    except Exception as e:
-        print("❌ Error retrieving chunks:", e)
-        return []
-    finally:
-        if 'cur' in locals():
-            cur.close()
-        if 'conn' in locals():
-            conn.close()
-
-# 🧠 Generate answer using GPT
-def generate_answer(query: str, chunks: List[str]) -> str:
-    context = "\n".join(chunks)
-    prompt = f"Context:\n{context}\n\nQuestion: {query}\nAnswer:"
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.5
-    )
-    return response.choices[0].message.content.strip()
-
-# 🚀 Endpoint
 @app.post("/generate")
-async def generate(data: Query):
-    try:
-        embedding = get_query_embedding(data.query)
-        chunks = retrieve_top_chunks(embedding)
-        answer = generate_answer(data.query, chunks)
-        return {
-            "query": data.query,
-            "answer": answer,
-            "chunks_used": chunks
-        }
-    except Exception as e:
-        print("❌ Internal Server Error:", e)
-        return {"error": "Internal Server Error"}, 500
+async def generate(request: QueryRequest):
+    query = request.query
+    source_filter = request.source
+
+    # 1. Embed the query
+    embedding = get_query_embedding(query)
+
+    # 2. Retrieve top chunks from DB
+    chunks = retrieve_top_chunks(embedding, source_filter=source_filter)
+
+    # 3. Format context
+    context = "\n\n".join([f"{chunk['text']}" for chunk in chunks])
+
+    # 4. Build prompt
+    prompt = f"""
+You are a scientific assistant. Use only the following excerpts to answer the question.
+
+{context}
+
+Question: {query}
+Answer:"""
+
+    # 5. Call GPT
+    completion = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "You are a helpful scientific assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.2,
+    )
+
+    answer = completion.choices[0].message.content.strip()
+
+    # 6. Return response
+    return {
+        "query": query,
+        "source": source_filter,
+        "answer": answer,
+        "chunks_used": chunks
+    }
