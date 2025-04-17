@@ -88,4 +88,19 @@ Want to understand how the backend, database, GPT, and frontend all connect?
 
 👉 [Click here to read the full system overview](./RAG_Conceptual_Overview.md)
 
----
+------
+
+## 📝 To-Do (Post-MVP Enhancements)
+
+- [ ] Investigate why `chunks_used` is sometimes empty
+  - Possibly adjust `top_k`, similarity threshold, or fallback logic
+  - Ensure source filtering matches indexed data
+
+- [ ] Add chunk relevance scoring and display (e.g. similarity scores)
+
+- [ ] Enhance ingestion logging with per-source summary
+
+- [ ] Add flag to generate from GPT only (without retrieval) for testing
+
+- [ ] Deploy backend and frontend for public demo
+
