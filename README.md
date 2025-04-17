@@ -104,3 +104,15 @@ Want to understand how the backend, database, GPT, and frontend all connect?
 
 - [ ] Deploy backend and frontend for public demo
 
+- [ ] 🕒 Add “Last ArXiv Sync” panel to Lovable frontend
+  - Show last ingestion timestamp for visibility
+  - Backend should expose `/last-sync` API
+
+- [ ] 📥 Add “Trigger Ingestion” button to Lovable
+  - Calls `/trigger-arxiv-sync` endpoint in FastAPI
+  - Useful for tutor testing + visibility
+
+- [ ] 📊 Show ArXiv source document count
+  - e.g. “ArXiv: 42 docs” — proves ingestion growth
+
+- [ ] (Optional) 🧠 Add ingestion history modal or JSON log
